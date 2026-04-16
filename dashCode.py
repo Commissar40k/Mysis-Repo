@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc
+from dash import Dash, dcc, html, Input, Output, callback
 import plotly.express as px
 import pandas as pd
 import csv
@@ -11,21 +11,37 @@ region=[]
 with open("data\daily_sales_data_MERGED.csv", newline="") as csvfile:
     reader=csv.reader(csvfile, delimiter=",", quotechar=" ")
     for row in reader:
-        sale.append(row[0])
-        date.append(row[1])
-        region.append(row[2])
+        if row[0]!="Date":
+            sale.append(row[0])
+            date.append(row[1])
+            region.append(row[2])
 
     
-df = pd.DataFrame(dict(date=date,sales=sale))
+df = pd.DataFrame(dict(date=date,sales=sale,region=region))
 
-fig = px.line(df, x="date", y="sales", title="Pink morsel sales")
+#fig = px.line(df, x="date", y="sales", title="Pink morsel sales")
 
 app.layout = html.Div(children=[
     dcc.Graph(
         id='example-graph',
-        figure=fig
-    )
+        #figure=fig
+    ),
+
+    dcc.RadioItems(['All', 'North', 'East', 'South', 'West'], 'All', inline=True, id="region")
 ])
+
+@callback(
+    Output('example-graph', 'figure'),
+    Input('region', 'value'))
+def update_figure(input_value):
+    if input_value=="All":
+        filtered_df = pd.DataFrame(dict(date=date,sales=sale,region=region))
+        fig = px.line(filtered_df, x="date", y="sales", title="Pink morsel sales")
+    else:
+        filtered_df = df[df.region == input_value.lower()]
+        fig = px.line(filtered_df, x="date", y="sales", title="Pink morsel sales")
+    fig.update_layout(transition_duration=500)
+    return fig
 
 if __name__ == '__main__':
     app.run(debug=True)
