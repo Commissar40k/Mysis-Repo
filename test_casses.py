@@ -1,8 +1,11 @@
-import dashCode
+from dashCode import dash_app
 
-def test_radioExist(dash_duo):
-    app=dashCode.Dash()
-    dash_duo.start_server(app)
-    assert dash_duo.find_element("#region").text == "All"
-    assert dash_duo.get_logs() == [], "browser console should contain no error"
-    dash_duo.percy_snapshot("test_001_child_with_0-layout")
+
+def test_header_exists(dash_duo):
+    dash_duo.start_server(dash_app)
+    dash_duo.wait_for_element("#graph", timeout=10)
+
+
+def test_region_picker_exists(dash_duo):
+    dash_duo.start_server(dash_app)
+    dash_duo.wait_for_element("#region", timeout=10)

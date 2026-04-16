@@ -21,9 +21,12 @@ df = pd.DataFrame(dict(date=date,sales=sale,region=region))
 
 #fig = px.line(df, x="date", y="sales", title="Pink morsel sales")
 
+# initialize dash
+dash_app = Dash(__name__)
+
 app.layout = html.Div(children=[
     dcc.Graph(
-        id='example-graph',
+        id='graph',
         #figure=fig
     ),
 
@@ -31,7 +34,7 @@ app.layout = html.Div(children=[
 ])
 
 @callback(
-    Output('example-graph', 'figure'),
+    Output('graph', 'figure'),
     Input('region', 'value'))
 def update_figure(input_value):
     if input_value=="All":
@@ -44,4 +47,4 @@ def update_figure(input_value):
     return fig
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    dash_app.run_server()
